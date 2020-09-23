@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Player.gd" type="Script" id=1]
-[ext_resource path="res://assets/Player/stick-man.png" type="Texture" id=2]
+[ext_resource path="res://src/Player.gd" type="Script" id=1]
+[ext_resource path="res://assets/stick-man.png" type="Texture" id=2]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -16,6 +16,8 @@ radius = 11.7947
 height = 9.61197
 
 [node name="Player" type="KinematicBody2D"]
+collision_layer = 2
+collision_mask = 5
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_group_": true
@@ -33,3 +35,16 @@ limit_left = -23
 limit_top = 0
 limit_right = 1576
 limit_bottom = 252
+
+[node name="SidestepTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="DebugLabel" type="Label" parent="."]
+margin_left = -16.0
+margin_top = -32.0
+margin_right = 16.0
+margin_bottom = -17.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="timeout" from="SidestepTimer" to="." method="_on_SidestepTimer_timeout"]

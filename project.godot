@@ -19,10 +19,20 @@ config/name="Rugby Rampage"
 run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+Constants="*res://src/Constants.gd"
+
 [display]
 
 window/size/width=640
 window/size/height=320
+
+[layer_names]
+
+2d_physics/layer_1="Environment"
+2d_physics/layer_2="Player"
+2d_physics/layer_3="Enemy"
 
 [rendering]
 
