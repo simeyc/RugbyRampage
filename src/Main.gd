@@ -10,4 +10,5 @@ func _ready():
 func _on_EnemyTimer_timeout():
 	var enemy = Enemy.instance()
 	add_child(enemy)
-	enemy.position = $EnemyPosition.position
+	enemy.position = $Level/Player/Camera2D.get_camera_position()
+	enemy.position.x +=	get_viewport_rect().size.x / 2

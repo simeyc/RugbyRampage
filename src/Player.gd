@@ -5,7 +5,7 @@ enum State {IDLE, RUN, SIDESTEP, TACKLED}
 export var dodge = false
 
 # constants
-var SPEED = 200
+var SPEED = 50
 # TODO: constants.gd?
 var GRAVITY = 2000
 var MAX_FALL_SPEED = GRAVITY
@@ -13,6 +13,7 @@ var MAX_FALL_SPEED = GRAVITY
 # variables
 var velocity = Vector2()
 var state = State.IDLE
+var dodgeable_enemy = null
 
 
 # Called when the node enters the scene tree for the first time.
@@ -21,16 +22,23 @@ func _ready():
 
 
 func _enter_state(new_state):
-	if new_state == State.RUN:
-		velocity.x = SPEED
-		$AnimatedSprite.scale = Vector2(1, 1)
-		dodge = false
-	elif new_state == State.SIDESTEP:
-		$SidestepTimer.start()
-		$AnimatedSprite.scale = Vector2(1.2, 1.2)
-		dodge = true
+	if state == State.TACKLED:
+		return # don't leave tackled state
 	state = new_state
-	$DebugLabel.text = State.keys()[state]
+	match state:
+		State.RUN:
+			velocity.x = SPEED
+			$AnimatedSprite.scale = Vector2(1, 1)
+			dodge = false
+		State.SIDESTEP:
+			$SidestepTimer.start()
+			$AnimatedSprite.scale = Vector2(1.2, 1.2)
+			dodge = dodgeable_enemy != null
+		State.TACKLED:
+			velocity.x = 0
+			$AnimatedSprite.rotation = -PI/2
+			$AnimatedSprite.position.y += 10
+	$DebugLabel.text = State.keys()[state] + ' SPEED: ' + str(velocity.x)
 
 
 func _input(event):	
@@ -49,8 +57,24 @@ func _physics_process(delta):
 	velocity = move_and_slide(velocity, Vector2.UP)
 
 
+func _body_is_enemy(body):
+	return body.collision_layer == (1 << Constants.CollisionBit.ENEMY)
+
 func _on_SidestepTimer_timeout():
 	_enter_state(State.RUN)
 
 
-# TODO: if collided with enemy while state != SIDESTEP, tackled!
+func _on_SidestepSweetArea_body_entered(body):
+	if _body_is_enemy(body):
+		dodgeable_enemy = body
+
+
+func _on_SidestepSweetArea_body_exited(body):
+	if body == dodgeable_enemy:
+		dodgeable_enemy = null
+
+
+func _on_ContactArea_body_entered(body):
+	if !dodge && _body_is_enemy(body):
+		_enter_state(State.TACKLED)
+		

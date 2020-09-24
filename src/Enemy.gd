@@ -3,7 +3,7 @@ extends KinematicBody2D
 enum State { RUN, TACKLE, TACKLE_HIT, TACKLE_MISS }
 
 # variables
-var speed = 100
+var speed = 25
 var velocity = Vector2(-speed, Constants.MAX_FALL_SPEED)
 var state = State.RUN
 
@@ -18,10 +18,11 @@ func _physics_process(delta):
 
 func _enter_state(new_state):
 	state = new_state
-	if state == State.TACKLE:
-		$AnimatedSprite.rotation = -PI/4
-	elif state == State.TACKLE_HIT:
-		emit_signal('tackle')
+	match state:
+		State.TACKLE:
+			$AnimatedSprite.rotation = -PI/4
+		State.TACKLE_HIT, State.TACKLE_MISS:
+			velocity.x = 0
 	$DebugLabel.text = State.keys()[state]
 
 
