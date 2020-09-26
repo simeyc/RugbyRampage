@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://src/Player.gd" type="Script" id=1]
 [ext_resource path="res://assets/stick-man.png" type="Texture" id=2]
@@ -14,12 +14,6 @@ animations = [ {
 [sub_resource type="CapsuleShape2D" id=2]
 radius = 11.7947
 height = 9.61197
-
-[sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 24, 10 )
-
-[sub_resource type="RectangleShape2D" id=4]
-extents = Vector2( 8, 16 )
 
 [node name="Player" type="KinematicBody2D"]
 z_index = 1
@@ -37,10 +31,9 @@ shape = SubResource( 2 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
-limit_left = -23
+limit_left = 0
 limit_top = 0
-limit_right = 1576
-limit_bottom = 252
+limit_bottom = 320
 
 [node name="SidestepTimer" type="Timer" parent="."]
 one_shot = true
@@ -53,19 +46,4 @@ margin_bottom = -17.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="SidestepSweetArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SidestepSweetArea"]
-position = Vector2( 50, 0 )
-shape = SubResource( 3 )
-
-[node name="ContactArea" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactArea"]
-position = Vector2( 10, 0 )
-shape = SubResource( 4 )
 [connection signal="timeout" from="SidestepTimer" to="." method="_on_SidestepTimer_timeout"]
-[connection signal="body_entered" from="SidestepSweetArea" to="." method="_on_SidestepSweetArea_body_entered"]
-[connection signal="body_exited" from="SidestepSweetArea" to="." method="_on_SidestepSweetArea_body_exited"]
-[connection signal="body_entered" from="ContactArea" to="." method="_on_ContactArea_body_entered"]

@@ -1,19 +1,18 @@
 extends KinematicBody2D
+class_name PlayerController
 
-enum State {IDLE, RUN, SIDESTEP, TACKLED}
+signal game_over()
 
-export var dodge = false
+const State := Constants.PlayerState
 
 # constants
-var SPEED = 50
-# TODO: constants.gd?
-var GRAVITY = 2000
-var MAX_FALL_SPEED = GRAVITY
+var SPEED = 200
 
-# variables
-var velocity = Vector2()
+# public members
 var state = State.IDLE
-var dodgeable_enemy = null
+
+# private members
+var _velocity = Vector2()
 
 
 # Called when the node enters the scene tree for the first time.
@@ -21,24 +20,28 @@ func _ready():
 	_enter_state(state)
 
 
+# called by enemy when player is tackled
+func on_tackled(force):
+	_velocity.x = -force
+	_enter_state(State.TACKLED)
+	
+
 func _enter_state(new_state):
 	if state == State.TACKLED:
 		return # don't leave tackled state
 	state = new_state
 	match state:
 		State.RUN:
-			velocity.x = SPEED
+			_velocity.x = SPEED
 			$AnimatedSprite.scale = Vector2(1, 1)
-			dodge = false
 		State.SIDESTEP:
 			$SidestepTimer.start()
+			# TODO: modifies velocity??
 			$AnimatedSprite.scale = Vector2(1.2, 1.2)
-			dodge = dodgeable_enemy != null
 		State.TACKLED:
-			velocity.x = 0
 			$AnimatedSprite.rotation = -PI/2
 			$AnimatedSprite.position.y += 10
-	$DebugLabel.text = State.keys()[state] + ' SPEED: ' + str(velocity.x)
+	#$DebugLabel.text = State.keys()[state]
 
 
 func _input(event):	
@@ -51,30 +54,19 @@ func _input(event):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
 	# apply gravity
-	velocity.y = min(velocity.y + Constants.GRAVITY * delta, Constants.MAX_FALL_SPEED)
+	_velocity.y += Constants.GRAVITY * delta
+	_velocity.y = min(_velocity.y, Constants.MAX_FALL_SPEED)
+	
+	if state == State.TACKLED:
+		# moving left
+		_velocity.x += Constants.DECELERATION
+		if _velocity.x >= 0:
+			_velocity.x = 0
+			# TODO: start GAME_OVER timer
 	
 	# update movement
-	velocity = move_and_slide(velocity, Vector2.UP)
+	_velocity.y = move_and_slide(_velocity, Vector2.UP).y
 
-
-func _body_is_enemy(body):
-	return body.collision_layer == (1 << Constants.CollisionBit.ENEMY)
 
 func _on_SidestepTimer_timeout():
 	_enter_state(State.RUN)
-
-
-func _on_SidestepSweetArea_body_entered(body):
-	if _body_is_enemy(body):
-		dodgeable_enemy = body
-
-
-func _on_SidestepSweetArea_body_exited(body):
-	if body == dodgeable_enemy:
-		dodgeable_enemy = null
-
-
-func _on_ContactArea_body_entered(body):
-	if !dodge && _body_is_enemy(body):
-		_enter_state(State.TACKLED)
-		

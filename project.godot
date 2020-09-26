@@ -8,15 +8,26 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "KinematicBody2D",
+"class": "PlayerController",
+"language": "GDScript",
+"path": "res://src/Player.gd"
+}, {
+"base": "Node",
+"class": "SceneSpawner",
+"language": "GDScript",
+"path": "res://src/SceneSpawner.gd"
+} ]
 _global_script_class_icons={
-
+"PlayerController": "",
+"SceneSpawner": ""
 }
 
 [application]
 
 config/name="Rugby Rampage"
-run/main_scene="res://Main.tscn"
+run/main_scene="res://scenes/Main.tscn"
 config/icon="res://icon.png"
 
 [autoload]
