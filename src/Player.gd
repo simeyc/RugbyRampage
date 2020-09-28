@@ -1,29 +1,38 @@
 extends KinematicBody2D
 class_name PlayerController
 
+
 signal game_over()
+
 
 const State := Constants.PlayerState
 
+
 # constants
 var SPEED = 200
+var SIDESTEP_TIME = 0.2
+
 
 # public members
 var state = State.IDLE
 
+
 # private members
-var _velocity = Vector2()
+var _velocity := Vector2()
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	_enter_state(state)
+	$SidestepTimer.wait_time = SIDESTEP_TIME
 
 
 # called by enemy when player is tackled
 func on_tackled(force):
 	_velocity.x = -force
 	_enter_state(State.TACKLED)
+	print('emit game_over')
+	emit_signal("game_over")
 	
 
 func _enter_state(new_state):
@@ -34,10 +43,11 @@ func _enter_state(new_state):
 		State.RUN:
 			_velocity.x = SPEED
 			$AnimatedSprite.scale = Vector2(1, 1)
+			$AnimatedSprite.position.y = 0
 		State.SIDESTEP:
 			$SidestepTimer.start()
-			# TODO: modifies velocity??
-			$AnimatedSprite.scale = Vector2(1.2, 1.2)
+			$AnimatedSprite.scale = Vector2(1.1, 1.1)
+			$AnimatedSprite.position.y = 5
 		State.TACKLED:
 			$AnimatedSprite.rotation = -PI/2
 			$AnimatedSprite.position.y += 10
