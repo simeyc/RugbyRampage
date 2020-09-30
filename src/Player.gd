@@ -1,45 +1,39 @@
 extends KinematicBody2D
 class_name PlayerController
 
+signal tackled()
 
-signal game_over()
-
-
-const State := Constants.PlayerState
-
+enum State {IDLE, RUN, SIDESTEP, TACKLED}
 
 # constants
 var SPEED = 200
 var SIDESTEP_TIME = 0.2
 
-
-# public members
-var state = State.IDLE
-
-
 # private members
+var _state = State.IDLE
 var _velocity := Vector2()
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_enter_state(state)
+	_enter_state(_state)
 	$SidestepTimer.wait_time = SIDESTEP_TIME
 
 
-# called by enemy when player is tackled
-func on_tackled(force):
-	_velocity.x = -force
-	_enter_state(State.TACKLED)
-	print('emit game_over')
-	emit_signal("game_over")
+# called by enemy to attempt tackle, return true if tackle successful
+func tackle(force):
+	var tackled = _state != State.SIDESTEP
+	if tackled:
+		_velocity.x = -force
+		_enter_state(State.TACKLED)
+		emit_signal("tackled")
+	return tackled
 	
 
 func _enter_state(new_state):
-	if state == State.TACKLED:
+	if _state == State.TACKLED:
 		return # don't leave tackled state
-	state = new_state
-	match state:
+	_state = new_state
+	match _state:
 		State.RUN:
 			_velocity.x = SPEED
 			$AnimatedSprite.scale = Vector2(1, 1)
@@ -55,9 +49,9 @@ func _enter_state(new_state):
 
 
 func _input(event):	
-	if state == State.IDLE and event.is_action_pressed("ui_right"):
+	if _state == State.IDLE and event.is_action_pressed("ui_right"):
 		_enter_state(State.RUN)
-	elif state == State.RUN and event.is_action_pressed("ui_accept"):
+	elif _state == State.RUN and event.is_action_pressed("ui_accept"):
 		_enter_state(State.SIDESTEP)
 
 
@@ -67,7 +61,7 @@ func _physics_process(delta):
 	_velocity.y += Constants.GRAVITY * delta
 	_velocity.y = min(_velocity.y, Constants.MAX_FALL_SPEED)
 	
-	if state == State.TACKLED:
+	if _state == State.TACKLED:
 		# moving left
 		_velocity.x += Constants.DECELERATION
 		if _velocity.x >= 0:

@@ -41,4 +41,4 @@ texture = ExtResource( 6 )
 centered = false
 offset = Vector2( 0, 180 )
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_Timer_timeout"]
-[connection signal="game_over" from="Player" to="." method="_on_Player_game_over"]
+[connection signal="tackled" from="Player" to="EnemySpawner" method="_on_Player_tackled"]

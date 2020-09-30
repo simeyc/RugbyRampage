@@ -4,7 +4,7 @@ extends Node
 const Enemy := preload("res://scenes/Enemy.tscn")
 
 
-var _position := Vector2(0, 200)
+var _position := Vector2()
 
 
 onready var timer := $Timer
@@ -14,7 +14,7 @@ onready var camera := player.get_node("Camera2D")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	player.connect("game_over", self, "_stop")
+	player.connect("tackled", self, "_stop")
 	_set_timeout()
 
 
@@ -33,6 +33,7 @@ func _on_Timer_timeout():
 	# set position just off screen
 	_position.x = camera.get_camera_screen_center().x + Constants.GROUND_WIDTH / 2
 	enemy.position = _position
+	player.connect("tackled", enemy, "_on_Player_tackled")
 	_set_timeout()
 
 
