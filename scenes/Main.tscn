@@ -10,18 +10,6 @@
 [node name="Main" type="Node2D"]
 script = ExtResource( 5 )
 
-[node name="EnemySpawner" type="Node" parent="."]
-script = ExtResource( 7 )
-
-[node name="Timer" type="Timer" parent="EnemySpawner"]
-wait_time = 2.0
-autostart = true
-
-[node name="Player" parent="." instance=ExtResource( 2 )]
-
-[node name="GroundSpawner" type="Node" parent="."]
-script = ExtResource( 3 )
-
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
@@ -40,5 +28,35 @@ motion_mirroring = Vector2( 700, 0 )
 texture = ExtResource( 6 )
 centered = false
 offset = Vector2( 0, 180 )
+
+[node name="EnemySpawner" type="Node" parent="."]
+script = ExtResource( 7 )
+
+[node name="Timer" type="Timer" parent="EnemySpawner"]
+wait_time = 2.0
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+
+[node name="GroundSpawner" type="Node" parent="."]
+script = ExtResource( 3 )
+
+[node name="TitleLabel" type="RichTextLabel" parent="."]
+margin_left = 248.213
+margin_top = 66.2133
+margin_right = 384.213
+margin_bottom = 112.213
+bbcode_enabled = true
+bbcode_text = "[color=black][b][shake rate=10 level=5]Rugby Rampage
+
+Press [Space] to start[/shake][/b][/color]"
+text = "Rugby Rampage
+
+Press [Space] to start"
+scroll_following = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="game_start" from="." to="Player" method="_on_Main_game_start"]
+[connection signal="game_start" from="." to="EnemySpawner" method="_on_Main_game_start"]
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_Timer_timeout"]
 [connection signal="tackled" from="Player" to="EnemySpawner" method="_on_Player_tackled"]

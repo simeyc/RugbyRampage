@@ -2,6 +2,7 @@ extends KinematicBody2D
 class_name PlayerController
 
 signal tackled()
+signal beat_enemy()
 
 enum State {IDLE, RUN, SIDESTEP, TACKLED}
 
@@ -26,6 +27,8 @@ func tackle(force):
 		_velocity.x = -force
 		_enter_state(State.TACKLED)
 		emit_signal("tackled")
+	else:
+		emit_signal("beat_enemy")
 	return tackled
 	
 
@@ -49,9 +52,7 @@ func _enter_state(new_state):
 
 
 func _input(event):	
-	if _state == State.IDLE and event.is_action_pressed("ui_right"):
-		_enter_state(State.RUN)
-	elif _state == State.RUN and event.is_action_pressed("ui_accept"):
+	if _state == State.RUN and event.is_action_pressed("ui_accept"):
 		_enter_state(State.SIDESTEP)
 
 
@@ -74,3 +75,11 @@ func _physics_process(delta):
 
 func _on_SidestepTimer_timeout():
 	_enter_state(State.RUN)
+
+
+func _on_Main_game_start():
+	_enter_state(State.RUN)
+
+
+func _on_Player_beat_enemy():
+	pass # Replace with function body.

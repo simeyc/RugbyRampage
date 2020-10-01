@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://src/Player.gd" type="Script" id=1]
 [ext_resource path="res://assets/stick-man.png" type="Texture" id=2]
+[ext_resource path="res://src/ScoreLabel.gd" type="Script" id=3]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -19,9 +20,6 @@ height = 9.61197
 z_index = 1
 collision_layer = 2
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_group_": true
-}
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )
@@ -46,4 +44,19 @@ margin_bottom = -17.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="CanvasLayer"]
+margin_left = 568.0
+margin_top = 8.0
+margin_right = 619.0
+margin_bottom = 22.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Score: 0"
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="beat_enemy" from="." to="CanvasLayer/ScoreLabel" method="_on_Player_beat_enemy"]
 [connection signal="timeout" from="SidestepTimer" to="." method="_on_SidestepTimer_timeout"]

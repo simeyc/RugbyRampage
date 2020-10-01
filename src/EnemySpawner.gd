@@ -39,3 +39,7 @@ func _on_Timer_timeout():
 
 func _stop():
 	timer.stop()
+
+
+func _on_Main_game_start():
+	timer.start()
