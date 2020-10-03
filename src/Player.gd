@@ -12,7 +12,7 @@ var SIDESTEP_TIME = 0.2
 
 # private members
 var _state = State.IDLE
-var _velocity := Vector2()
+var _speed := 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -24,7 +24,7 @@ func _ready():
 func tackle(force):
 	var tackled = _state != State.SIDESTEP
 	if tackled:
-		_velocity.x = -force
+		_speed = -force
 		_enter_state(State.TACKLED)
 		emit_signal("tackled")
 	else:
@@ -38,7 +38,7 @@ func _enter_state(new_state):
 	_state = new_state
 	match _state:
 		State.RUN:
-			_velocity.x = SPEED
+			_speed = SPEED
 			$AnimatedSprite.scale = Vector2(1, 1)
 			$AnimatedSprite.position.y = 0
 		State.SIDESTEP:
@@ -57,29 +57,20 @@ func _input(event):
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _physics_process(delta):
-	# apply gravity
-	_velocity.y += Constants.GRAVITY * delta
-	_velocity.y = min(_velocity.y, Constants.MAX_FALL_SPEED)
-	
+func _physics_process(delta):	
 	if _state == State.TACKLED:
 		# moving left
-		_velocity.x += Constants.DECELERATION
-		if _velocity.x >= 0:
-			_velocity.x = 0
-			# TODO: start GAME_OVER timer
+		_speed += Constants.DECELERATION
+		if _speed >= 0:
+			_speed = 0
 	
-	# update movement
-	_velocity.y = move_and_slide(_velocity, Vector2.UP).y
+	# fall to ground at high speed, then stay snapped to floor
+	move_and_slide_with_snap(Vector2(_speed, 10000), Vector2.DOWN, Vector2.UP)
 
 
 func _on_SidestepTimer_timeout():
 	_enter_state(State.RUN)
 
 
-func _on_Main_game_start():
+func _on_Countdown_done():
 	_enter_state(State.RUN)
-
-
-func _on_Player_beat_enemy():
-	pass # Replace with function body.

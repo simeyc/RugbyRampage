@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://assets/background.png" type="Texture" id=1]
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://src/GroundSpawner.gd" type="Script" id=3]
+[ext_resource path="res://src/Countdown.gd" type="Script" id=4]
 [ext_resource path="res://src/Main.gd" type="Script" id=5]
 [ext_resource path="res://assets/banner.png" type="Texture" id=6]
 [ext_resource path="res://src/EnemySpawner.gd" type="Script" id=7]
@@ -29,34 +30,52 @@ texture = ExtResource( 6 )
 centered = false
 offset = Vector2( 0, 180 )
 
+[node name="Player" parent="." instance=ExtResource( 2 )]
+position = Vector2( 64.2172, 212.273 )
+
+[node name="GroundSpawner" type="Node" parent="."]
+script = ExtResource( 3 )
+
 [node name="EnemySpawner" type="Node" parent="."]
 script = ExtResource( 7 )
 
 [node name="Timer" type="Timer" parent="EnemySpawner"]
 wait_time = 2.0
 
-[node name="Player" parent="." instance=ExtResource( 2 )]
-
-[node name="GroundSpawner" type="Node" parent="."]
-script = ExtResource( 3 )
-
-[node name="TitleLabel" type="RichTextLabel" parent="."]
-margin_left = 248.213
-margin_top = 66.2133
-margin_right = 384.213
-margin_bottom = 112.213
-bbcode_enabled = true
-bbcode_text = "[color=black][b][shake rate=10 level=5]Rugby Rampage
-
-Press [Space] to start[/shake][/b][/color]"
-text = "Rugby Rampage
-
-Press [Space] to start"
-scroll_following = true
+[node name="Countdown" type="Label" parent="."]
+margin_left = 301.109
+margin_top = 82.5406
+margin_right = 335.109
+margin_bottom = 96.5406
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "3"
+align = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="game_start" from="." to="Player" method="_on_Main_game_start"]
-[connection signal="game_start" from="." to="EnemySpawner" method="_on_Main_game_start"]
-[connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_Timer_timeout"]
+
+[node name="Timer" type="Timer" parent="Countdown"]
+autostart = true
+
+[node name="GameOverHUD" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="GameOverHUD"]
+margin_left = 247.95
+margin_top = 64.8118
+margin_right = 390.95
+margin_bottom = 112.812
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "You were tackled!
+
+Press Space to restart."
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="tackled" from="Player" to="." method="_on_Player_tackled"]
 [connection signal="tackled" from="Player" to="EnemySpawner" method="_on_Player_tackled"]
+[connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_Timer_timeout"]
+[connection signal="done" from="Countdown" to="Player" method="_on_Countdown_done"]
+[connection signal="done" from="Countdown" to="EnemySpawner" method="_on_Countdown_done"]
+[connection signal="timeout" from="Countdown/Timer" to="Countdown" method="_on_Timer_timeout"]

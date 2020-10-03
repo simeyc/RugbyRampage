@@ -1,15 +1,21 @@
 extends Node2D
 
-signal game_start()
+var _game_over := false
 
-var _started := false
+onready var GameOverLabel = $GameOverHUD/Label
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
+	GameOverLabel.visible = false
 
 func _input(event):
-	if !_started and event.is_action_pressed("ui_accept"):
-		emit_signal("game_start")
-		_started = true
+	if _game_over and event.is_action_pressed("ui_accept"):
+		get_tree().reload_current_scene()
+		_game_over = false
+
+
+func _on_Player_tackled():
+	_game_over = true
+	GameOverLabel.visible = true

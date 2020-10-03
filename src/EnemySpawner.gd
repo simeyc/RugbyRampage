@@ -23,8 +23,8 @@ func _process(delta):
 
 
 func _set_timeout():
-	# set random timeout between 1-2 seconds
-	timer.wait_time = rand_range(1, 2)
+	# set random timeout within range
+	timer.wait_time = rand_range(0.5, 1.5)
 
 
 func _on_Timer_timeout():
@@ -41,5 +41,5 @@ func _stop():
 	timer.stop()
 
 
-func _on_Main_game_start():
+func _on_Countdown_done():
 	timer.start()

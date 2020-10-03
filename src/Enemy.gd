@@ -32,9 +32,8 @@ func _physics_process(delta):
 	if _state in [State.TACKLE_MISS, State.TACKLE_HIT]:
 		_speed += Constants.DECELERATION
 		_speed = min(_speed, 0)
-	# TODO: why is move_and_slide_with_snap not working??
-	#move_and_slide_with_snap(Vector2(_speed, 0), Vector2.DOWN * 320, Vector2.UP)
-	move_and_slide(Vector2(_speed, Constants.GRAVITY), Vector2.UP)
+	# fall to ground at high speed, then stay snapped to floor
+	move_and_slide_with_snap(Vector2(_speed, 10000), Vector2.DOWN, Vector2.UP)
 
 
 func _enter_state(new_state):
