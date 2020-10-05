@@ -28,7 +28,7 @@ motion_mirroring = Vector2( 700, 0 )
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/ParallaxLayer2"]
 texture = ExtResource( 6 )
 centered = false
-offset = Vector2( 0, 180 )
+offset = Vector2( 0, 200 )
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 64.2172, 212.273 )
