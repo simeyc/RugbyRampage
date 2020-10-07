@@ -2,7 +2,7 @@ extends KinematicBody2D
 
 const PlayerController = preload("res://src/Player.gd")
 
-enum State { RUN, TACKLE, TACKLE_HIT, TACKLE_MISS, IDLE }
+enum State { RUN, TACKLE, TACKLE_HIT, TACKLE_MISS, TACKLE_BROKE, IDLE }
 
 # constants
 const TACKLE_FORCE = 200
@@ -19,7 +19,8 @@ onready var camera = get_node("/root/Main/Player/Camera2D")
 func _ready():
 	_speed = -rand_range(MIN_SPEED, MAX_SPEED)
 	var sprite_types = $AnimatedSprite.frames.get_animation_names()
-	$AnimatedSprite.animation = sprite_types[randi() % sprite_types.size()]
+	$AnimatedSprite.animation = 'blue_run'
+	#$AnimatedSprite.animation = sprite_types[randi() % sprite_types.size()]
 
 
 func _process(delta):
@@ -32,6 +33,9 @@ func _physics_process(delta):
 	if _state in [State.TACKLE_MISS, State.TACKLE_HIT]:
 		_speed += Constants.DECELERATION
 		_speed = min(_speed, 0)
+	elif _state == State.TACKLE_BROKE:
+		_speed -= Constants.DECELERATION
+		_speed = max(_speed, 0)
 	# fall to ground at high speed, then stay snapped to floor
 	move_and_slide_with_snap(Vector2(_speed, 10000), Vector2.DOWN, Vector2.UP)
 
@@ -43,6 +47,9 @@ func _enter_state(new_state):
 		_speed = -TACKLE_FORCE
 	elif _state == State.IDLE:
 		_speed = 0
+	elif _state == State.TACKLE_BROKE:
+		$AnimatedSprite.rotation = 0
+		$AnimatedSprite.animation = 'blue_knocked'
 	#$DebugLabel.text = State.keys()[_state]
 
 
@@ -55,8 +62,13 @@ func _on_TackleRange_body_entered(body):
 func _on_ContactArea_body_entered(body):
 	var player := body as PlayerController
 	if player:
-		if player.tackle(TACKLE_FORCE):
+		var tackle_data = player.tackle(-TACKLE_FORCE)
+		if tackle_data["result"] == Constants.TackleResult.HIT:
 			_enter_state(State.TACKLE_HIT)
+			_speed = tackle_data["force"]
+		elif tackle_data["result"] == Constants.TackleResult.BREAK:
+			_enter_state(State.TACKLE_BROKE)
+			_speed = tackle_data["force"]
 		else:
 			_enter_state(State.TACKLE_MISS)
 
