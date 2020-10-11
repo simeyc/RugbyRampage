@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/ground_wide.png" type="Texture" id=1]
+[ext_resource path="res://assets/banner.png" type="Texture" id=2]
+[ext_resource path="res://assets/background.png" type="Texture" id=3]
+
+[node name="ParallaxBackground" type="ParallaxBackground"]
+
+[node name="Sky" type="ParallaxLayer" parent="."]
+motion_scale = Vector2( 0.25, 1 )
+motion_mirroring = Vector2( 700, 0 )
+
+[node name="Sprite" type="Sprite" parent="Sky"]
+texture = ExtResource( 3 )
+centered = false
+
+[node name="Banner" type="ParallaxLayer" parent="."]
+motion_scale = Vector2( 0.8, 1 )
+motion_mirroring = Vector2( 700, 0 )
+
+[node name="Sprite" type="Sprite" parent="Banner"]
+texture = ExtResource( 2 )
+centered = false
+offset = Vector2( 0, 110 )
+
+[node name="Ground" type="ParallaxLayer" parent="."]
+motion_mirroring = Vector2( 700, 0 )
+
+[node name="Sprite" type="Sprite" parent="Ground"]
+texture = ExtResource( 1 )
+centered = false

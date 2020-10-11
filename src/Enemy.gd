@@ -19,8 +19,7 @@ onready var camera = get_node("/root/Main/Player/Camera2D")
 func _ready():
 	_speed = -rand_range(MIN_SPEED, MAX_SPEED)
 	var sprite_types = $AnimatedSprite.frames.get_animation_names()
-	$AnimatedSprite.animation = 'blue_run'
-	#$AnimatedSprite.animation = sprite_types[randi() % sprite_types.size()]
+	$AnimatedSprite.animation = sprite_types[randi() % sprite_types.size()]
 
 
 func _process(delta):
@@ -36,8 +35,7 @@ func _physics_process(delta):
 	elif _state == State.TACKLE_BROKE:
 		_speed -= Constants.DECELERATION
 		_speed = max(_speed, 0)
-	# fall to ground at high speed, then stay snapped to floor
-	move_and_slide_with_snap(Vector2(_speed, 10000), Vector2.DOWN, Vector2.UP)
+	move_and_slide(Vector2(_speed, 0), Vector2.UP)
 
 
 func _enter_state(new_state):
@@ -48,8 +46,7 @@ func _enter_state(new_state):
 	elif _state == State.IDLE:
 		_speed = 0
 	elif _state == State.TACKLE_BROKE:
-		$AnimatedSprite.rotation = 0
-		$AnimatedSprite.animation = 'blue_knocked'
+		pass # TODO
 	#$DebugLabel.text = State.keys()[_state]
 
 

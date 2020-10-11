@@ -32,6 +32,7 @@ func _on_Timer_timeout():
 	add_child(enemy)
 	# set position just off screen
 	_position.x = camera.get_camera_screen_center().x + Constants.GROUND_WIDTH / 2
+	_position.y = rand_range(Constants.BOUND_UPPER, Constants.BOUND_LOWER)
 	enemy.position = _position
 	player.connect("tackled", enemy, "_on_Player_tackled")
 	_set_timeout()

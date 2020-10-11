@@ -12,7 +12,7 @@ var DODGE_TIME = 0.2
 
 # private members
 var _state = State.IDLE
-var _speed := 0
+var _velocity := Vector2.ZERO
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -26,7 +26,7 @@ func tackle(force):
 	var result = Constants.TackleResult.MISS
 	if tackled:
 		result = Constants.TackleResult.HIT
-		_speed = force
+		_velocity.x = force
 		_enter_state(State.TACKLED)
 		emit_signal("tackled")
 	elif _state == State.HANDOFF:
@@ -43,7 +43,7 @@ func _enter_state(new_state):
 	_state = new_state
 	match _state:
 		State.RUN:
-			_speed = SPEED
+			_velocity.x = SPEED
 			$AnimatedSprite.animation = 'run'
 			$AnimatedSprite.scale = Vector2(1, 1)
 			$AnimatedSprite.position.y = 0
@@ -60,6 +60,7 @@ func _enter_state(new_state):
 		State.TACKLED:
 			$AnimatedSprite.rotation = -PI/2
 			$AnimatedSprite.position.y += 10
+			_velocity.y = 0
 		State.HANDOFF:
 			$AnimatedSprite.animation = 'handoff'
 			$DodgeTimer.start()
@@ -79,12 +80,20 @@ func _input(event):
 func _physics_process(delta):	
 	if _state == State.TACKLED:
 		# moving left
-		_speed += Constants.DECELERATION
-		if _speed >= 0:
-			_speed = 0
-	
-	# fall to ground at high speed, then stay snapped to floor
-	move_and_slide_with_snap(Vector2(_speed, 10000), Vector2.DOWN, Vector2.UP)
+		_velocity.x += Constants.DECELERATION
+		if _velocity.x >= 0:
+			_velocity.x = 0
+	else:
+		_velocity = Vector2.ZERO
+		if Input.is_action_pressed("move_right"):
+			_velocity.x = 100
+		elif Input.is_action_pressed("move_left"):
+			_velocity.x = -50
+		if Input.is_action_pressed("move_up") and position.y > Constants.BOUND_UPPER:
+			_velocity.y = -50
+		elif Input.is_action_pressed("move_down") and position.y < Constants.BOUND_LOWER:
+			_velocity.y = 50
+	move_and_slide(_velocity, Vector2.UP)
 
 
 func _on_DodgeTimer_timeout():
